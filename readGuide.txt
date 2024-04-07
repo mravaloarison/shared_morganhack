@@ -1,0 +1,6 @@
+- UI
+- API
+- ML
+- GenAI
+- Testing
+- Documentation
