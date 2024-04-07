@@ -3,37 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diabetes Prediction</title>
+    <title>Consume API</title>
 </head>
 <body>
     <script>
-        async function predictDiabetes(features) {
-            try {
-                const response = await fetch('http://localhost:5000/predict', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({features: features}),
-                });
+        const baseUrl = 'http://localhost:5000';
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+        // Consume the /predict endpoint
+        async function makePrediction(features) {
+            const response = await fetch(`${baseUrl}/predict`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({features: features}),
+            });
 
-                const prediction = await response.json();
-                console.log('Prediction:', prediction);
-                alert(`Prediction result: ${prediction}`);
-            } catch (error) {
-                console.error('Error during prediction:', error);
-            }
+            const prediction = await response.json();
+            console.log('Prediction:', prediction);
         }
 
-        // Example input features, replace with actual input features for your model
-        const features = [6,148,72,35,0,33.6,0.627,50];
+        // Consume the /meal_plans/<plan_type> endpoint
+        async function getMealPlan(planType) {
+            const response = await fetch(`${baseUrl}/meal_plans/${planType}`);
+            const mealPlan = await response.json();
+            console.log(`Meal Plan (${planType}):`, mealPlan);
+        }
 
-        // Trigger the prediction function with your input features
-        predictDiabetes(features);
+        // Example features, replace with your actual features
+        const features = [6,148,72,35,0,33.6,0.627,50];
+        const planType = 'low_carb'; // Can be 'low_carb', 'plant_based', or 'high_protein'
+
+        makePrediction(features);
+        getMealPlan(planType);
     </script>
 </body>
 </html>
