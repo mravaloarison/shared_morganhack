@@ -1,34 +1,18 @@
-import numpy as np
-import pandas as pd
-from flask import Flask, request, render_template
-import pickle
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import joblib
 
 app = Flask(__name__)
-model = pickle.load(open('model.pkl', 'rb'))
+CORS(app)
 
-@app.route('/')
-def home():
-  return render_template('index.html')
+# Load the model
+model = joblib.load('model.pkl')
 
-@app.route('/predict',methods=['POST'])
+@app.route('/predict', methods=['POST'])
 def predict():
-  input_features = [int(x) for x in request.form.values()]
-  features_value = [np.array(input_features)]
+    data = request.get_json(force=True)
+    prediction = model.predict([data['features']])
+    return jsonify(prediction.tolist())
 
-  features_name = ['Pregnancies', 'BloodPressure','Glucose' 'SkinThickness',
-       'insulin', 'BMI', 'DiabetesPedigreeFunction',
-       'age']
-
-  df = pd.DataFrame(features_value, columns=features_name)
-  output = model.predict(df)
-
-  if output == 4:
-      res_val = "Has Breast Lump  and It is Cancerous (Malignant)"
-  else:
-      res_val = "Does not Have Breat Lump (Benign)"
-
-
-  return render_template('index.html', prediction_text='Patient  {}'.format(res_val))
-
-if __name__ == "__main__":
-  app.run()
+if __name__ == '__main__':
+    app.run(debug=True)
